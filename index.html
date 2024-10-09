@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <title>Pinterest-Style Wedding Gallery</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #ffecd2, #fcb69f);
+            padding: 20px;
+            color: #333;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4a4a4a;
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .gallery {
+            column-count: 4;
+            column-gap: 15px;
+        }
+        
+        .gallery-item {
+            background-color: #fff;
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 15px;
+            border-radius: 15px;
+            box-shadow: 0px 6px 12px rgba(0,0,0,0.15);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.08);
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            object-fit: cover;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        .footer a {
+            color: #ff7e5f;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer a:hover {
+            color: #ffb88c;
+        }
+    </style>
+</head>
+<body>
+    <h1>Wedding Ceremony of Jafar and Shajrat</h1>
+    <div class="gallery" id="gallery"></div>
+
+    <div class="footer">
+        <p>Made with <i class="fas fa-heart" style="color: #ff6b6b;"></i> by TAB to celebrate love and togetherness. <a href="#"></a></p>
+    </div>
+
+    <script>
+        async function loadImages() {
+            const apiKey = 'AIzaSyAarbHZq71Xnm9l9EabxlO-AwEp6nIrccM';
+            const folderId = '1aADOorsbkrge7gx5UAyyllj2kZVjXvA6';
+            const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id%2Cname%2CmimeType)`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const files = data.files;
+                const gallery = document.getElementById('gallery');
+
+                if (files && files.length > 0) {
+                    // Shuffle the files array
+                    files.sort(() => Math.random() - 0.5);
+
+                    files.forEach(file => {
+                        if (file.mimeType.startsWith('image/')) {
+                            const imageUrl = `https://drive.google.com/uc?export=view&id=${file.id}`;
+                            const imgElement = document.createElement('div');
+                            imgElement.classList.add('gallery-item');
+                            imgElement.innerHTML = `
+                                <img src="${imageUrl}" alt="Image" onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=${file.id}&sz=w1600-h900';">
+                            `;
+                            gallery.appendChild(imgElement);
+                        }
+                    });
+                } else {
+                    gallery.innerHTML = '<p>No images found in this folder.</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching images:', error);
+            }
+        }
+
+        loadImages();
+    </script>
+</body>
+</html>
